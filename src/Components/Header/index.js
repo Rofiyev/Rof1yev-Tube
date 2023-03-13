@@ -35,6 +35,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { header, profileData } from "../../Data";
 import logo from "../../Image/Logotip_2.jpg";
 import { HeaderIconWrapper } from "../../Style/MenuListStyle";
+import { useNavigate } from "react-router-dom";
 
 const drawerWidth = 240;
 
@@ -121,12 +122,27 @@ export default function Header({ category, categoryFunc, children }) {
   const handleOpenUserMenu = (event) => setAnchorElUser(event.currentTarget);
   const handleCloseUserMenu = () => setAnchorElUser(null);
 
+  const [value, setValue] = React.useState("");
+  const navigate = useNavigate();
+  const submit = (e) => {
+    e.preventDefault();
+    if (value) navigate(`/search/${value}`);
+
+    setValue("");
+  };
+
   const { mode, toggleMode } = React.useContext(ThemeContextMode);
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <AppBar position="fixed" open={open}>
-        <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Toolbar
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            p: { xs: 1, sm: 2 },
+          }}
+        >
           <Stack direction={"row"} alignItems={"center"}>
             <IconButton
               color="inherit"
@@ -134,13 +150,15 @@ export default function Header({ category, categoryFunc, children }) {
               onClick={handleDrawerOpen}
               edge="start"
               sx={{
-                marginRight: 4,
+                marginRight: { xs: 0, sm: 2 },
                 ...(open && { display: "none" }),
               }}
             >
               <MenuIcon />
             </IconButton>
-            <Box sx={{ cursor: "pointer" }}>
+            <Box
+              sx={{ cursor: "pointer", display: { xs: "none", sm: "block" } }}
+            >
               <Typography
                 sx={{ fontWeight: "bold", letterSpacing: 1 }}
                 component={"h3"}
@@ -157,31 +175,40 @@ export default function Header({ category, categoryFunc, children }) {
               </Typography>
             </Box>
           </Stack>
-          <Box sx={{ display: { xs: "none", md: "block" }, width: "50%" }}>
-            <TextField
-              sx={{ fontWeight: "bold" }}
-              fullWidth
-              label="Search"
-              size="small"
-              color="info"
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton sx={{ p: 0.5 }}>
-                      <SearchIcon />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
+          <Box
+            sx={{
+              display: { xs: "block", md: "block" },
+              width: { xs: "65%", sm: "40%", md: "50%" },
+            }}
+          >
+            <Box component={"form"} onSubmit={submit}>
+              <TextField
+                sx={{ fontWeight: "bold" }}
+                fullWidth
+                label="Search"
+                size="small"
+                color="info"
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton type="submit" sx={{ p: 0.5 }}>
+                        <SearchIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Box>
           </Box>
-          <Stack direction={"row"} alignItems={"center"} gap={"10px"}>
+          <Stack direction={"row"} alignItems={"center"} gap={"8px"}>
             <Box sx={{ display: { xs: "none", sm: "block" } }}>
               <IconButton>
                 <VideoCallIcon />
               </IconButton>
               <IconButton aria-label={notificationsLabel(100)}>
-                <Badge badgeContent={100} color="error">
+                <Badge badgeContent={9} color="error">
                   <NotificationsIcon />
                 </Badge>
               </IconButton>
@@ -365,11 +392,12 @@ export default function Header({ category, categoryFunc, children }) {
         </DrawerHeader>
         <Divider />
         <List>
-          {header.sidebar.map((item, index) => {
-            if (item.text) {
-              return (
-                <HeaderIconWrapper key={index}>
+          <HeaderIconWrapper>
+            {header.sidebar.map((item, index) => {
+              if (item.text) {
+                return (
                   <ListItem
+                    key={index}
                     className="menuItem"
                     disablePadding
                     sx={{ display: "block" }}
@@ -392,18 +420,17 @@ export default function Header({ category, categoryFunc, children }) {
                       </ListItemIcon>
                       <ListItemText
                         sx={{ opacity: open ? 1 : 0, fontWeight: "bold" }}
-                      >
-                        {item.text}
-                      </ListItemText>
+                        primary={item.text}
+                      />
                     </ListItemButton>
                   </ListItem>
-                </HeaderIconWrapper>
-              );
-            } else return <Divider key={index} />;
-          })}
+                );
+              } else return <Divider key={index} />;
+            })}
+          </HeaderIconWrapper>
         </List>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      <Box component="div" sx={{ flexGrow: 1, p: { xs: 1, sm: 1.5, md: 3 } }}>
         <DrawerHeader />
         <DrawerHeader />
         {children}

@@ -53,12 +53,12 @@ export default function Main({ category }) {
                   letterSpacing: 1,
                 }}
               >
-                <PermScanWifiIcon sx={{ mr: 1, fontSize: "2rem" }} /> Xatolik
-                Mavjud!
+                <PermScanWifiIcon sx={{ mr: 1, fontSize: "2rem" }} />
+                Xatolik Mavjud!
               </Typography>
             </Box>
           ) : (
-            <Grid container spacing={2}>
+            <Grid container spacing={2} sx={{ mt: { xs: 2, sm: 0 } }}>
               <VideosCard media={media} />
             </Grid>
           )}
