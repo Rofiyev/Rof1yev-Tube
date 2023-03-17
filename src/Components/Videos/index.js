@@ -8,17 +8,15 @@ import {
 } from "@mui/material";
 import React from "react";
 import moment from "moment";
-import numeral from "numeral";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import { CardActionArea } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function VideosCard({ media }) {
   const navigate = useNavigate();
-
   return (
     <>
       {media.map((item, index) => (
@@ -30,9 +28,7 @@ export default function VideosCard({ media }) {
                 height="180"
                 image={item.snippet?.thumbnails?.high?.url}
                 alt={item.id.videoId}
-                onClick={() =>
-                  navigate(`/video/${item.id.videoId}`)
-                }
+                onClick={() => navigate(`/video/${item.id.videoId}`)}
               />
             </CardActionArea>
             <CardContent
@@ -52,48 +48,50 @@ export default function VideosCard({ media }) {
               >
                 {`${item?.snippet?.title.slice(0, 55)}...`}
               </Typography>
-              <Stack mt={1} direction={"column"}>
+              <Box mt={1} width={"100%"}>
                 <Box
-                  sx={{ display: "flex", alignItems: "center", gap: "10px" }}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: "10px",
+                  }}
                 >
-                  <Avatar
-                    src={item.snippet.thumbnails.default.url}
-                    alt="Logo"
-                    sx={{ mr: 1 }}
-                  />
-                  <Typography
-                    sx={{
-                      fontSize: "14px",
-                      display: "flex",
-                      alignItems: "center",
-                      fontWeight: "bold",
-                    }}
-                    component={"p"}
-                    variant="p"
-                  >
-                    {item?.snippet?.channelTitle}
-                  </Typography>
-                </Box>
-                <Stack
-                  direction={"row"}
-                  justifyContent={"space-between"}
-                  alignItems={"center"}
-                >
-                  <Typography
-                    component={"span"}
-                    variant="span"
-                    sx={{ fontSize: "13px", px: 1, mt: 1 }}
-                  >
-                    {`${numeral(Math.floor(Math.random() * 1203066)).format(
-                      "0.0a"
-                    )} views`}{" "}
-                    • {moment(item?.snippet?.publishTime).fromNow()}
-                  </Typography>
+                  <Stack direction={"row"}>
+                    <Link to={`/channel/${item?.snippet?.channelId}`}>
+                      <Avatar
+                        src={item.snippet.thumbnails.default.url}
+                        alt="Logo"
+                        sx={{ mr: 1 }}
+                      />
+                    </Link>
+                    <Stack direction={"column"}>
+                      <Typography
+                        sx={{
+                          fontSize: "14px",
+                          display: "flex",
+                          alignItems: "center",
+                          fontWeight: "bold",
+                        }}
+                        component={"p"}
+                        variant="p"
+                      >
+                        {item?.snippet?.channelTitle}
+                      </Typography>
+                      <Typography
+                        component={"span"}
+                        variant="span"
+                        sx={{ fontSize: "13px" }}
+                      >
+                        {moment(item?.snippet?.publishTime).fromNow()}
+                      </Typography>
+                    </Stack>
+                  </Stack>
                   <IconButton size="large" color="inherit">
                     <MoreVertIcon />
                   </IconButton>
-                </Stack>
-              </Stack>
+                </Box>
+              </Box>
             </CardContent>
           </Card>
         </Grid>

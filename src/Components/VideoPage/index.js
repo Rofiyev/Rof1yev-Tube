@@ -19,6 +19,8 @@ import {
   CardActionArea,
   CardContent,
   CardMedia,
+  Chip,
+  CircularProgress,
   Grid,
   InputAdornment,
   Menu,
@@ -32,17 +34,18 @@ import VideoCallIcon from "@mui/icons-material/VideoCall";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { profileData } from "../../Data";
 import { HeaderIconWrapper } from "../../Style/MenuListStyle";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
 import { getData } from "../../API";
 import numeral from "numeral";
-import moment from "moment";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
 import ThumbDownAltIcon from "@mui/icons-material/ThumbDownAlt";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import ThumbDownOffAltIcon from "@mui/icons-material/ThumbDownOffAlt";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import moment from "moment";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 const drawerWidth = 240;
 
@@ -65,30 +68,36 @@ const AppBar = styled(MuiAppBar, {
 }));
 
 export default function VideoPage() {
-  const [open, setOpen] = React.useState(false);
   const [subscribe, setSubscribe] = React.useState(true);
   const [media, setMedia] = React.useState([]);
+  const [relatedMedia, setRelatedMedia] = React.useState([]);
   const [value, setValue] = React.useState("");
   const [like, setLike] = React.useState(false);
   const [notLike, setNotLike] = React.useState(false);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const { id } = useParams();
-  console.log(id);
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     const getMedia = async () => {
-      const res = await getData(`search?part=snippet&q=${id}`);
-      if (res.seccess) setMedia(res.data.items);
+      const res = await getData(`videos?part=snippet,statistics&id=${id}`);
+      const searchData = await getData(
+        `search?part=snippet&relatedToVideoId=${id}`
+      );
+
+      if (res.seccess && searchData.seccess) {
+        setMedia(res.data.items[0]);
+        setRelatedMedia(searchData.data.items);
+      }
+
+      setLoading(false);
     };
     getMedia();
   }, [id]);
 
-  const handleDrawerOpen = () => setOpen(true);
-
   const notificationsLabel = (count) => {
     if (count === 0) return "no notifications";
     if (count > 99) return "more than 99 notifications";
-
     return `${count} notifications`;
   };
 
@@ -107,25 +116,29 @@ export default function VideoPage() {
 
   return (
     <>
-      <AppBar position="fixed" open={open}>
-        <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+      <AppBar position="fixed">
+        <Toolbar
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            p: { xs: 1, sm: 2 },
+          }}
+        >
           <Stack direction={"row"} alignItems={"center"}>
             <IconButton
               color="inherit"
               aria-label="open drawer"
-              onClick={() => {
-                handleDrawerOpen();
-                navigate("/");
-              }}
+              onClick={() => navigate("/")}
               edge="start"
               sx={{
-                marginRight: 4,
-                ...(open && { display: "none" }),
+                marginRight: { xs: 0, sm: 2 },
               }}
             >
               <HomeIcon />
             </IconButton>
-            <Box sx={{ cursor: "pointer" }}>
+            <Box
+              sx={{ cursor: "pointer", display: { xs: "none", sm: "block" } }}
+            >
               <Typography
                 sx={{ fontWeight: "bold", letterSpacing: 1 }}
                 component={"h3"}
@@ -142,7 +155,12 @@ export default function VideoPage() {
               </Typography>
             </Box>
           </Stack>
-          <Box sx={{ display: { xs: "none", md: "block" }, width: "50%" }}>
+          <Box
+            sx={{
+              display: { xs: "block", md: "block" },
+              width: { xs: "65%", sm: "40%", md: "50%" },
+            }}
+          >
             <Box component={"form"} onSubmit={submit}>
               <TextField
                 sx={{ fontWeight: "bold" }}
@@ -164,7 +182,7 @@ export default function VideoPage() {
               />
             </Box>
           </Box>
-          <Stack direction={"row"} alignItems={"center"} gap={"10px"}>
+          <Stack direction={"row"} alignItems={"center"} gap={"8px"}>
             <Box sx={{ display: { xs: "none", sm: "block" } }}>
               <IconButton>
                 <VideoCallIcon />
@@ -264,172 +282,244 @@ export default function VideoPage() {
       </AppBar>
       <Box sx={{ marginTop: "70px" }} p={2}>
         <Grid container spacing={2}>
-          <Grid item xs={12} md={9}>
-            <Box
-              component={"iframe"}
-              width={"100%"}
-              height={"415px"}
-              src={`https://www.youtube.com/embed/${id}`}
-              title="YouTube video player"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-            ></Box>
-            <Typography
-              my={1}
-              sx={{
-                fontWeight: "bold",
-                cursor: "pointer",
-                fontSize: "18px",
-              }}
-            >
-              {media[0]?.snippet?.description}
-            </Typography>
-            <Box
-              width={"100%"}
-              display={"flex"}
-              alignItems={"center"}
-              justifyContent={"space-between"}
-            >
-              <Box display={"flex"} alignItems={"center"}>
-                <Avatar src={media[0]?.snippet?.thumbnails?.default?.url} />
-                <Box ml={1} mr={3}>
-                  <Typography fontWeight={600} sx={{ cursor: "pointer" }}>
-                    {media[0]?.snippet?.channelTitle}
-                  </Typography>
-                  <Typography fontSize={"14px"}>
-                    {" "}
-                    {`${numeral(Math.floor(Math.random() * 1203066)).format(
-                      "0.0a"
-                    )} follows`}
-                  </Typography>
-                </Box>
-                {subscribe ? (
-                  <Button
-                    variant="outlined"
-                    startIcon={<NotificationsActiveIcon />}
-                    onClick={() => setSubscribe(!subscribe)}
-                    color={"error"}
-                  >
-                    Obuna bo'lindi
-                  </Button>
-                ) : (
-                  <Button
-                    variant="contained"
-                    startIcon={<NotificationsIcon />}
-                    onClick={() => setSubscribe(!subscribe)}
-                    color={"error"}
-                  >
-                    Obuna bo'lish
-                  </Button>
-                )}
-              </Box>
-              <ButtonGroup
-                variant="outlined"
-                color="error"
-                aria-label="outlined button group"
+          {loading ? (
+            <Grid item xs={12} mb={2}>
+              <Box
+                height={"100vh"}
+                display={"flex"}
+                justifyContent={"center"}
+                alignItems={"center"}
               >
-                <Button
-                  startIcon={like ? <ThumbUpAltIcon /> : <ThumbUpOffAltIcon />}
-                  onClick={() => {
-                    setLike(!like);
-                    setNotLike(false);
-                  }}
-                  sx={{ fontWeight: "bold", fontSize: "16px" }}
-                >
-                  {!like ? 99 : 99 + 1}
-                </Button>
-                <Button
-                  startIcon={
-                    notLike ? <ThumbDownAltIcon /> : <ThumbDownOffAltIcon />
-                  }
-                  onClick={() => {
-                    setNotLike(!notLike);
-                    setLike(false);
-                  }}
-                ></Button>
-              </ButtonGroup>
-            </Box>
-          </Grid>
-          <Grid item sx={{ display: { xs: "none", md: "block" } }} md={3}>
-            {media.map((item, index) => (
-              <Card key={index} sx={{ maxWidth: "100%" }}>
-                <CardActionArea>
-                  <CardMedia
-                    component="img"
-                    height="180"
-                    image={item.snippet?.thumbnails?.high?.url}
-                    alt={item.id.videoId}
-                    onClick={() => navigate(`/video/${item.id.videoId}`)}
-                  />
-                </CardActionArea>
-                <CardContent
+                <CircularProgress color="error" />
+              </Box>
+            </Grid>
+          ) : (
+            <>
+              <Grid item xs={12} md={9}>
+                <Box
+                  component={"iframe"}
+                  width={"100%"}
+                  height={"415px"}
+                  src={`https://www.youtube.com/embed/${media.id}`}
+                  title="YouTube video player"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                ></Box>
+                <Stack
+                  justifyContent={"space-between"}
+                  direction={"row"}
+                  flexWrap={"wrap"}
+                  gap={"8px"}
                   sx={{
-                    mt: 1,
-                    dispaly: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                    px: 1,
-                    py: 1.5,
+                    alignItems: { xs: "flex-start", sm: "center" },
                   }}
                 >
-                  <Typography
-                    component={"p"}
-                    variant="p"
-                    sx={{ fontWeight: "bold" }}
-                  >
-                    {`${item?.snippet?.title.slice(0, 55)}...`}
-                  </Typography>
-                  <Stack mt={1} direction={"column"}>
-                    <Box
+                  <Box>
+                    <Typography
+                      my={1}
                       sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "10px",
+                        fontWeight: "bold",
+                        cursor: "pointer",
+                        fontSize: "18px",
                       }}
                     >
+                      {media?.snippet?.title}
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Chip
+                      label={`${numeral(media.statistics?.viewCount).format(
+                        "0.0a"
+                      )} views`}
+                      icon={<VisibilityIcon />}
+                    />
+                  </Box>
+                </Stack>
+                <Typography
+                  my={1}
+                  sx={{
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                  }}
+                >
+                  {media?.snippet?.description?.slice(0, 400)}
+                </Typography>
+                <Box
+                  width={"100%"}
+                  display={"flex"}
+                  alignItems={"center"}
+                  justifyContent={"space-between"}
+                  flexWrap={"wrap"}
+                  gap={"10px"}
+                >
+                  <Box
+                    display={"flex"}
+                    alignItems={"center"}
+                    flexWrap={"wrap"}
+                    gap={"10px"}
+                  >
+                    <Link to={`/channel/${media?.snippet?.channelId}`}>
                       <Avatar
-                        src={item.snippet.thumbnails.default.url}
-                        alt="Logo"
-                        sx={{ mr: 1 }}
+                        src={media.snippet?.thumbnails?.default?.url}
+                        alt={media.snippet?.title}
                       />
-                      <Typography
-                        sx={{
-                          fontSize: "14px",
-                          display: "flex",
-                          alignItems: "center",
-                          fontWeight: "bold",
-                        }}
-                        component={"p"}
-                        variant="p"
-                      >
-                        {item?.snippet?.channelTitle}
+                    </Link>
+                    <Box ml={1} mr={3}>
+                      <Typography fontWeight={600} sx={{ cursor: "pointer" }}>
+                        {media.snippet?.channelTitle}
                       </Typography>
                     </Box>
-                    <Stack
-                      direction={"row"}
-                      justifyContent={"space-between"}
-                      alignItems={"center"}
+                    {subscribe ? (
+                      <Button
+                        variant="outlined"
+                        startIcon={<NotificationsActiveIcon />}
+                        onClick={() => setSubscribe(!subscribe)}
+                        color={"error"}
+                        sx={{ whiteSpace: "nowrap" }}
+                      >
+                        Obuna bo'lindi
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="contained"
+                        startIcon={<NotificationsIcon />}
+                        onClick={() => setSubscribe(!subscribe)}
+                        color={"error"}
+                        sx={{ whiteSpace: "nowrap" }}
+                      >
+                        Obuna bo'lish
+                      </Button>
+                    )}
+                  </Box>
+                  <ButtonGroup
+                    variant="outlined"
+                    color="error"
+                    aria-label="outlined button group"
+                  >
+                    <Button
+                      startIcon={
+                        like ? <ThumbUpAltIcon /> : <ThumbUpOffAltIcon />
+                      }
+                      onClick={() => {
+                        setLike(!like);
+                        setNotLike(false);
+                      }}
+                      sx={{ fontWeight: "bold", fontSize: "16px" }}
+                    >
+                      {!like
+                        ? `${numeral(media?.statistics?.likeCount).format(
+                            "0.0a"
+                          )}`
+                        : `${numeral(
+                            parseInt(media?.statistics?.likeCount) + 1
+                          ).format("0.0a")}`}
+                    </Button>
+                    <Button
+                      startIcon={
+                        notLike ? <ThumbDownAltIcon /> : <ThumbDownOffAltIcon />
+                      }
+                      onClick={() => {
+                        setNotLike(!notLike);
+                        setLike(false);
+                      }}
+                    ></Button>
+                  </ButtonGroup>
+                </Box>
+              </Grid>
+              <Grid
+                item
+                sx={{
+                  overflowY: "scroll",
+                  maxHeight: "110vh",
+                }}
+                xs={12}
+                md={3}
+              >
+                {relatedMedia?.map((item, index) => (
+                  <Card key={index} sx={{ maxWidth: "100%" }}>
+                    <CardActionArea>
+                      <CardMedia
+                        component="img"
+                        sx={{ minHeight: "180px" }}
+                        image={item.snippet?.thumbnails?.high?.url}
+                        alt={item.id.videoId}
+                        onClick={() => navigate(`/video/${item.id.videoId}`)}
+                      />
+                    </CardActionArea>
+                    <CardContent
+                      sx={{
+                        mt: 1,
+                        dispaly: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                        px: 1,
+                        py: 1.5,
+                      }}
                     >
                       <Typography
-                        component={"span"}
-                        variant="span"
-                        sx={{ fontSize: "13px", px: 1, mt: 1 }}
+                        component={"p"}
+                        variant="p"
+                        sx={{ fontWeight: "bold" }}
                       >
-                        {`${numeral(Math.floor(Math.random() * 1203066)).format(
-                          "0.0a"
-                        )} views`}{" "}
-                        • {moment(item?.snippet?.publishTime).fromNow()}
+                        {`${item?.snippet?.title.slice(0, 55)}...`}
                       </Typography>
-                      <IconButton size="large" color="inherit">
-                        <MoreVertIcon />
-                      </IconButton>
-                    </Stack>
-                  </Stack>
-                </CardContent>
-              </Card>
-            ))}
-          </Grid>
+                      <Stack mt={1} direction={"column"}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "10px",
+                          }}
+                        >
+                          <Link to={`/channel/${item.id.videoId}`}>
+                            <Avatar
+                              src={item.snippet.thumbnails.default.url}
+                              alt="Logo"
+                              sx={{ mr: 1 }}
+                            />
+                          </Link>
+
+                          <Typography
+                            sx={{
+                              fontSize: "14px",
+                              display: "flex",
+                              alignItems: "center",
+                              fontWeight: "bold",
+                            }}
+                            component={"p"}
+                            variant="p"
+                          >
+                            {item?.snippet?.channelTitle}
+                          </Typography>
+                        </Box>
+                        <Stack
+                          direction={"row"}
+                          justifyContent={"space-between"}
+                          alignItems={"center"}
+                        >
+                          <Typography
+                            component={"span"}
+                            variant="span"
+                            sx={{ fontSize: "13px", px: 1, mt: 1 }}
+                          >
+                            {`${numeral(
+                              Math.floor(Math.random() * 1203066)
+                            ).format("0.0a")} views`}{" "}
+                            • {moment(item?.snippet?.publishTime).fromNow()}
+                          </Typography>
+                          <IconButton size="large" color="inherit">
+                            <MoreVertIcon />
+                          </IconButton>
+                        </Stack>
+                      </Stack>
+                    </CardContent>
+                  </Card>
+                ))}
+              </Grid>
+            </>
+          )}
         </Grid>
       </Box>
     </>

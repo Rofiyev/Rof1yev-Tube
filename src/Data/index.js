@@ -42,14 +42,17 @@ export const header = {
     {
       text: "Home",
       icon: <AiOutlineHome className="icon" />,
+      path: "/",
     },
     {
       text: "Shorts",
       icon: <BsPlayCircle className="icon" />,
+      path: "",
     },
     {
       text: "Subscriptions",
       icon: <TfiLayoutMediaCenterAlt className="icon" />,
+      path: "",
     },
     {
       text: "",
@@ -57,22 +60,27 @@ export const header = {
     {
       text: "Library",
       icon: <BsCollectionPlayFill className="icon" />,
+      path: "",
     },
     {
       text: "History",
       icon: <BsClockHistory className="icon" />,
+      path: "",
     },
     {
       text: "Your Videos",
       icon: <AiOutlinePlaySquare className="icon" />,
+      path: "",
     },
     {
       text: "Watch later",
       icon: <BsClock className="icon" />,
+      path: "",
     },
     {
       text: "Likes Videos",
       icon: <AiOutlineLike className="icon" />,
+      path: "",
     },
     {
       text: "",
@@ -80,30 +88,37 @@ export const header = {
     {
       text: "Trending",
       icon: <AiOutlineFire className="icon" />,
+      path: "",
     },
     {
       text: "Music",
       icon: <CgMusicNote className="icon" />,
+      path: "",
     },
     {
       text: "Live",
       icon: <RiLiveLine className="icon" />,
+      path: "",
     },
     {
       text: "Gaming",
       icon: <SiYoutubegaming className="icon" />,
+      path: "",
     },
     {
       text: "News",
       icon: <IoNewspaperOutline className="icon" />,
+      path: "",
     },
     {
       text: "Sports",
       icon: <TfiCup className="icon" />,
+      path: "",
     },
     {
       text: "Fashion & Beauty",
       icon: <FaShopify className="icon" />,
+      path: "",
     },
     {
       text: "",
@@ -111,18 +126,22 @@ export const header = {
     {
       text: "Settings",
       icon: <AiFillSetting className="icon" />,
+      path: "",
     },
     {
       text: "Report history",
       icon: <BsFlag className="icon" />,
+      path: "",
     },
     {
       text: "Help",
       icon: <AiOutlineQuestionCircle className="icon" />,
+      path: "",
     },
     {
       text: "Send feedback",
       icon: <BsExclamationLg className="icon" />,
+      path: "",
     },
   ],
   header: [
@@ -141,6 +160,9 @@ export const header = {
     "World news",
     "Movies",
     "Cartoon",
+    "Comic",
+    "ReactJS",
+    "JavaScript",
   ],
 };
 
@@ -150,68 +172,81 @@ export const profileData = {
       icon: <FiUser className="icon" />,
       text: "Kanalingiz",
       chevron: false,
+      path: "",
     },
     {
       icon: <RiPlayCircleLine className="icon" />,
       text: "YouTube Studio",
       chevron: false,
+      path: "",
     },
     {
       icon: <RiUserShared2Line className="icon" />,
       text: "Hisobingizni almashtirish",
       chevron: true,
+      path: "",
     },
     {
       icon: <RxExit className="icon" />,
       text: "Chiqish",
       chevron: false,
+      path: "",
     },
     { text: "" },
     {
       icon: <RiMoneyDollarCircleLine className="icon" />,
       text: "Xarid va Homiyliklar",
       chevron: false,
+      path: "",
     },
     {
       icon: <FaUserCog className="icon" />,
       text: "YouTubedagi ma'lumotlaringiz",
       chevron: false,
+      path: "",
     },
     { text: "" },
     {
       icon: <IoInvertMode className="icon" />,
       text: "Rejim: Kun/Tun",
       chevron: true,
+      path: "",
     },
     {
       icon: <TbLanguageHiragana className="icon" />,
       text: "Tilni sozlash",
       chevron: true,
+      path: "",
     },
     {
       icon: <GrSecure className="icon" />,
       text: "Xavsizlik",
       chevron: true,
+      path: "",
     },
     {
       icon: <IoEarthOutline className="icon" />,
       text: "Mamlakat",
       chevron: true,
+      path: "",
     },
     { text: "" },
     {
       icon: <AiFillSetting className="icon" />,
       text: "Sozlamalar",
       chevron: false,
+      path: "",
     },
     { text: "" },
     {
       text: "Yordam",
       icon: <AiOutlineQuestionCircle className="icon" />,
+      path: "",
     },
     {
       text: "Fikr-mulohaza",
       icon: <BsExclamationLg className="icon" />,
+      path: "",
     },
   ],
 };
