@@ -1,39 +1,49 @@
 import React, { useEffect, useState } from "react";
-import { styled } from "@mui/material/styles";
 import {
   Avatar,
   Box,
+  Button,
   CircularProgress,
-  Divider,
-  Drawer,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
+  Stack,
+  Tab,
+  Tabs,
   Typography,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
-import { header } from "../../Data";
-import logo from "../../Image/Logotip_2.jpg";
-import { HeaderIconWrapper } from "../../Style/MenuListStyle";
-import { Stack } from "@mui/system";
 import { getData } from "../../API";
+import numeral from "numeral";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+import TabPanel from "../Tabs/TabsItem";
+import PropTypes from "prop-types";
 
-const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "flex-end",
-  padding: theme.spacing(0, 1),
-  ...theme.mixins.toolbar,
-}));
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
+};
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
+  };
+}
 
 export default function ChannelPage() {
-  const [open] = useState(true);
   const [channelDetail, setChannelDetail] = useState([]);
   const [video, setVideo] = useState([]);
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
+  const [subscribe, setSubscribe] = React.useState(true);
+  const [value, setValue] = React.useState(0);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  console.log(channelDetail);
+  console.log(video);
 
   useEffect(() => {
     const getChannelData = async () => {
@@ -41,12 +51,11 @@ export default function ChannelPage() {
         const resChannel = await getData(
           `channels?part=snippet,statistics&id=${id}`
         );
-        console.log(resChannel);
         const resVideo = await getData(`search?channelId=${id}&part=snippet`);
 
-        if (resChannel.seccess & resVideo.succsess) {
-          setChannelDetail(resChannel.items[0]);
-          setVideo(resVideo.items);
+        if (resChannel.seccess & resVideo.seccess) {
+          setChannelDetail(resChannel.data.items[0]);
+          setVideo(resVideo.data.items);
         }
 
         setLoading(false);
@@ -59,87 +68,15 @@ export default function ChannelPage() {
 
   return (
     <Stack sx={{ display: "flex" }}>
-      <Drawer
-        variant="permanent"
-        open={open}
-        sx={{ width: "250px", display: { xs: "none", md: "block" } }}
-      >
-        <DrawerHeader
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            px: 2,
-          }}
-        >
-          <Avatar
-            sx={{
-              width: "50px",
-              height: "50px",
-              objectFit: "cover",
-              cursor: "pointer",
-            }}
-            src={logo}
-          />
-          <Typography
-            variant="h6"
-            noWrap
-            component="h3"
-            sx={{
-              fontFamily: "Poppins",
-              fontWeight: "bold",
-              letterSpacing: 1,
-            }}
-          >
-            Bo'limlar
-          </Typography>
-        </DrawerHeader>
-        <Divider />
-        <List>
-          <HeaderIconWrapper>
-            {header.sidebar.map((item, index) => {
-              if (item.text) {
-                return (
-                  <ListItem
-                    key={index}
-                    className="menuItem"
-                    disablePadding
-                    sx={{ display: "block" }}
-                  >
-                    <ListItemButton
-                      sx={{
-                        minHeight: 48,
-                        justifyContent: open ? "initial" : "center",
-                        px: 2.5,
-                      }}
-                    >
-                      <ListItemIcon
-                        sx={{
-                          minWidth: 0,
-                          mr: open ? 3 : "auto",
-                          justifyContent: "center",
-                        }}
-                      >
-                        {item.icon}
-                      </ListItemIcon>
-                      <ListItemText
-                        sx={{ opacity: open ? 1 : 0, fontWeight: "bold" }}
-                        primary={item.text}
-                      />
-                    </ListItemButton>
-                  </ListItem>
-                );
-              } else return <Divider key={index} />;
-            })}
-          </HeaderIconWrapper>
-        </List>
-      </Drawer>
       <Box
-        sx={{ width: { xs: "100%", md: "75%" }, ml: { xs: 0, md: "240px" } }}
+        sx={{
+          width: "100%",
+          minHeight: "100vh",
+        }}
       >
         {loading ? (
           <Box
-            height={"100%"}
+            height={"100vh"}
             width={"100%"}
             display={"flex"}
             justifyContent={"center"}
@@ -148,7 +85,133 @@ export default function ChannelPage() {
             <CircularProgress color="error" />
           </Box>
         ) : (
-          <h1>ChannelPage: {id}</h1>
+          <Box sx={{ width: "100%" }}>
+            <Box
+              sx={{
+                width: "100%",
+                height: "50vh",
+                backgroundImage: `url(${channelDetail?.brandingSettings?.image?.bannerExternalUrl})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+                mb: 2,
+              }}
+            ></Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: "15px",
+              }}
+            >
+              <Stack
+                direction={"row"}
+                flexWrap={"wrap"}
+                alignItems={"center"}
+                gap={"10px"}
+              >
+                <Avatar
+                  sx={{ width: "120px", height: "120px", objectFit: "cover" }}
+                  src={channelDetail?.snippet?.thumbnails?.high?.url}
+                  alt="Avatar"
+                />
+                <Stack direction={"column"}>
+                  <Typography
+                    sx={{
+                      fontSize: "20px",
+                      fontWeight: "bold",
+                      fontFamily: "Poppins', sans-serif",
+                      letterSpacing: "2px",
+                    }}
+                  >
+                    {channelDetail?.brandingSettings?.channel?.title}
+                  </Typography>
+                  <Typography>{channelDetail?.snippet?.customUrl}</Typography>
+                  <Typography
+                    sx={{
+                      fontSize: "16px",
+                      fontFamily: "Poppins', sans-serif",
+                    }}
+                  >
+                    {`${numeral(
+                      channelDetail?.statistics?.subscriberCount
+                    ).format("0.0a")} subscribers`}
+                  </Typography>
+                </Stack>
+              </Stack>
+              {subscribe ? (
+                <Button
+                  variant="outlined"
+                  startIcon={<NotificationsActiveIcon />}
+                  onClick={() => setSubscribe(!subscribe)}
+                  color={"error"}
+                  sx={{ whiteSpace: "nowrap" }}
+                >
+                  Obuna bo'lindi
+                </Button>
+              ) : (
+                <Button
+                  variant="contained"
+                  startIcon={<NotificationsIcon />}
+                  onClick={() => setSubscribe(!subscribe)}
+                  color={"error"}
+                  sx={{ whiteSpace: "nowrap" }}
+                >
+                  Obuna bo'lish
+                </Button>
+              )}
+            </Box>
+            <Box sx={{ width: "100%" }} mt={4}>
+              <Box
+                sx={{
+                  borderBottom: 1,
+                  borderColor: "divider",
+                  maxWidth: { xs: "270px", sm: "490px", md: "100%" },
+                }}
+              >
+                <Tabs
+                  sx={{ color: "#121212", fontWeight: "bold" }}
+                  textColor="#121212"
+                  value={value}
+                  onChange={handleChange}
+                  variant="scrollable"
+                  scrollButtons="auto"
+                  TabIndicatorProps={{ style: { background: "crimson" } }}
+                >
+                  <Tab
+                    sx={{ fontWight: "bold" }}
+                    label="Home"
+                    {...a11yProps(0)}
+                  />
+                  <Tab label="Videos" {...a11yProps(1)} />
+                  <Tab label="Shorts" {...a11yProps(2)} />
+                  <Tab label="Playlists" {...a11yProps(3)} />
+                  <Tab label="Channel" {...a11yProps(4)} />
+                  <Tab label="About" {...a11yProps(5)} />
+                </Tabs>
+              </Box>
+              <TabPanel value={value} index={0}>
+                Home
+              </TabPanel>
+              <TabPanel value={value} index={1}>
+                Videos
+              </TabPanel>
+              <TabPanel value={value} index={2}>
+                Shorts
+              </TabPanel>
+              <TabPanel value={value} index={3}>
+                Playlists
+              </TabPanel>
+              <TabPanel value={value} index={4}>
+                Channel
+              </TabPanel>
+              <TabPanel value={value} index={5}>
+                About
+              </TabPanel>
+            </Box>
+          </Box>
         )}
       </Box>
     </Stack>

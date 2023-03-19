@@ -299,55 +299,59 @@ export default function Header({ category, categoryFunc, children }) {
             </IconButton>
           </Stack>
         </Toolbar>
-        <Box
-          px={2.5}
-          my={1}
-          display={"flex"}
-          width={"100%"}
-          justifyContent={"center"}
-        >
+        {category ? (
           <Box
-            width={"100%"}
+            px={2.5}
+            my={1}
             display={"flex"}
-            gap={"7px"}
-            sx={{
-              overflowX: "scroll",
-              scrollbarWidth: "thin",
-              "&::-webkit-scrollbar": {
-                width: "0.2em",
-                height: "7px",
-              },
-              "&::-webkit-scrollbar-track": {
-                background: "#f1f1f1",
-              },
-              "&::-webkit-scrollbar-thumb": {
-                backgroundColor: "#c30010",
-                borderRadius: "10px",
-                cursor: "pointer",
-              },
-            }}
+            width={"100%"}
+            justifyContent={"center"}
           >
-            {header.header.map((item, index) => (
-              <Typography
-                mb={1}
-                key={index}
-                sx={{
-                  background: category === item ? "#000" : "#aaa",
-                  padding: "5px 10px",
-                  borderRadius: 1,
-                  fontSize: "14px",
-                  color: category === item ? "#fff" : "#000",
+            <Box
+              width={"100%"}
+              display={"flex"}
+              gap={"7px"}
+              sx={{
+                overflowX: "scroll",
+                scrollbarWidth: "thin",
+                "&::-webkit-scrollbar": {
+                  width: "0.2em",
+                  height: "7px",
+                },
+                "&::-webkit-scrollbar-track": {
+                  background: "#f1f1f1",
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  backgroundColor: "#c30010",
+                  borderRadius: "10px",
                   cursor: "pointer",
-                  whiteSpace: "nowrap",
-                  userSelect: "none",
-                }}
-                onClick={() => categoryFunc(item)}
-              >
-                {item}
-              </Typography>
-            ))}
+                },
+              }}
+            >
+              {header.header.map((item, index) => (
+                <Typography
+                  mb={1}
+                  key={index}
+                  sx={{
+                    background: category === item ? "#000" : "#aaa",
+                    padding: "5px 10px",
+                    borderRadius: 1,
+                    fontSize: "14px",
+                    color: category === item ? "#fff" : "#000",
+                    cursor: "pointer",
+                    whiteSpace: "nowrap",
+                    userSelect: "none",
+                  }}
+                  onClick={() => categoryFunc(item)}
+                >
+                  {item}
+                </Typography>
+              ))}
+            </Box>
           </Box>
-        </Box>
+        ) : (
+          <></>
+        )}
       </AppBar>
       <Drawer variant="permanent" open={open}>
         <DrawerHeader
@@ -385,6 +389,7 @@ export default function Header({ category, categoryFunc, children }) {
               fontFamily: "Poppins",
               fontWeight: "bold",
               letterSpacing: 1,
+              display: open ? "block" : "none",
             }}
           >
             Bo'limlar
@@ -432,7 +437,7 @@ export default function Header({ category, categoryFunc, children }) {
       </Drawer>
       <Box component="div" sx={{ flexGrow: 1, p: { xs: 1, sm: 1.5, md: 3 } }}>
         <DrawerHeader />
-        <DrawerHeader />
+        {category ? <DrawerHeader /> : <></>}
         {children}
       </Box>
     </Box>

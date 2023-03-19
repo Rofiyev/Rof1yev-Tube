@@ -38,7 +38,16 @@ export default function App() {
             }
           />
           <Route path="/video/:id" element={<VideoPage />} />
-          <Route path="/channel/:id" element={<ChannelPage />} />
+          <Route
+            path="/channel/:id"
+            element={
+              <>
+                <Header>
+                  <ChannelPage />
+                </Header>
+              </>
+            }
+          />
           <Route path="/search/:id" element={<SearchResultPage />} />
         </Routes>
       </ThemeProvider>
